@@ -1,0 +1,19 @@
+body {
+  font-family: 'Open Sans', sans-serif;
+  background:#f7f7f7;
+}
+
+h1, h2, h3,h4,h5 {
+  font-family:'Abril Fatface', cursive;
+}
+
+header {
+  background:#22f4b1;
+  padding:15px;
+}
+
+header svg {
+  fill:#fff;
+  width:40%;
+  max-width:200px;
+}
