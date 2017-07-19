@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link href="https://fonts.googleapis.com/css?family=Lato|Lora|Ultra" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+</head>
+<body>
+  <input class="get-zip" type="text" placeholder="Enter ZIP" value="78741"></input>
+  <button class="pol-get">GIMME DATA!</button>
+  <script>
+  function grabPolInfo(){
+    let zip = $('.get-zip').val();
+    let address = 'Austin Texas ' + zip;
+
+    //representative obj to store in mongoose
+    function Politician(name, party, twitterHandle, email, level, title, socLinks, urls) {
+      this.name = name;
+      this.party = party;
+      this.twitterHandle = twitterHandle;
+      this.email = email;
+      this.level = level;
+      this.title = title;
+      this.socLinks = socLinks;
+      this.urls = urls;
+    }
+
+    const INFO_API = 'https://www.googleapis.com/civicinfo/v2/representatives';
+    let params = {
+      key: 'AIzaSyBzYen7lF7bJ7MTg5y0vdIILDtVX4RlpVw',
+      address: address
+    }
+    $.getJSON(INFO_API, params).then(function(data){
+      //grab objects from data
+      const divisions = data['divisions'];
+      const offices = data['offices'];
+      const officials = data['officials']
+      console.log(data);
+      console.log(divisions);
+      console.log(offices);
+      console.log(officials);
+
+      //create empty arrays to store pol objects
+      let fedReps = [];
+      let stateReps = [];
+      let countyReps = [];
+      let cityReps = [];
+
+      //manipulating the data here at the divisions object
+      //need to start here to build arrays of objects
+      for (let [key, value] of Object.entries(divisions)) {
+
+        //these variables get passed into nested loops
+        let levelObj = value; //SHOULD GET THE FOUR OBJECTS
+        console.log(levelObj);
+
+        //initializing this variable to link levels with offices
+        let divisionID;
+
+        if(levelObj.name === 'United States') {
+          divisionID = 'ocd-division/country:us';
+        }
+
+        if(levelObj.name === 'Texas') {
+          divisionID = 'ocd-division/country:us/state:tx';
+        }
+
+        if(levelObj.name === 'Travis County') {
+          divisionID = 'ocd-division/country:us/state:tx/county:travis';
+        }
+
+        if(levelObj.name === 'Austin city') {
+          divisionID = 'ocd-division/country:us/state:tx/place:austin';
+        }
+
+        console.log(divisionID);
+
+        //placeholders for the pol object -> global to this for loop scope b/c will be changing
+        let name;
+        let party;
+        let twitterHandle;
+        let email;
+        let level;
+        let title;
+        let socLinks;
+        let urls;
+
+        level = levelObj.name;
+        console.log(level);
+
+        //this array contains the indices of the officials
+        for(i=0; i<offices.length; i++) {
+
+          let officeID = offices[i].divisionId;
+          // console.log(officeID);
+          // console.log('DIVISION ID HERE ' + divisionID); <--THIS IS GOOD
+
+          let officialArr;
+
+          if(divisionID === officeID) {
+            title = offices[i].name;
+            console.log(title);
+            officialArr = offices[i].officialIndices;
+            console.log(officialArr);
+            return officialArr;
+          }
+
+          for(i=0; i<officials.length; i++) {
+            if(officialArr.includes(i)) {
+                console.log(officials[i]);
+              }
+          }
+          //   title = offices[i].name;
+          //   console.log(title);
+          //
+          //   let officialArr = offices[i].officialIndices;
+          //   console.log(offices[i].officialIndices);
+          //
+          //   for(i=0; i<officials.length; i++) {
+          //     if(officialArr.includes(i)) {
+          //       console.log(officials[i]);
+          //     }
+          //   }
+          // }
+        // console.log('\n-------------------------');
+        // console.log('Index ' + i);
+        // console.log('Name: ' +name);
+        // console.log('Party: ' +party);
+        // console.log('Twitter: ' +twitterHandle);
+        // console.log('Email: ' +email);
+        // console.log('Locality: ' +locality);
+        // console.log('Level: ' +level);
+        // console.log('Social: ' +socLinks);
+        // console.log('URLs: ' +urls);
+        }
+      };
+    }
+  )};
+  $('.pol-get').on('click', grabPolInfo);
+  </script>
+</body>
+</html>
